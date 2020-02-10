@@ -1,0 +1,6 @@
+version: "3.7"
+services:
+  bnp_test:
+    build:
+      context: .
+      target: bnp_test
