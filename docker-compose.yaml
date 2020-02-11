@@ -4,3 +4,5 @@ services:
     build:
       context: .
       target: bnp_test
+    volumes:
+      - ./src:/src

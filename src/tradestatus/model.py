@@ -1,7 +1,7 @@
 import io
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
-from typing import IO, Iterator
+from typing import IO, Iterator, TextIO
 
 import pandas
 
@@ -59,7 +59,6 @@ def get_populated_table(data: Iterator[Trade]) -> pandas.DataFrame:
 
 
 def states_function(row):
-
     if row["NumberOfTrades"] < row["ExpectedNumberOfTrades"]:
         return "Pending"
 
@@ -70,7 +69,6 @@ def states_function(row):
 
 
 def calculate_summary_table(trades_table: pandas.DataFrame) -> pandas.DataFrame:
-
     summary_table = trades_table.groupby("CorrelationID").agg(
         {"NumberOfTrades": "count", "Value": "sum", "Limit": "max"}
     )
@@ -80,4 +78,11 @@ def calculate_summary_table(trades_table: pandas.DataFrame) -> pandas.DataFrame:
     summary_table["State"] = pandas.Series(
         data=summary_table.apply(states_function, axis=1), dtype=str
     )
-    return pandas.DataFrame(summary_table, columns=["NumberOfTrades", "State"])
+    return pandas.DataFrame(
+        summary_table, columns=["ExpectedNumberOfTrades", "State"]
+    ).rename(columns={"ExpectedNumberOfTrades": "NumberOfTrades"})
+
+
+def run_trade_summary(input_file: TextIO, output_file: TextIO):
+    summary = calculate_summary_table(get_populated_table(read_xml(input_file)))
+    summary.to_csv(output_file, header=True)

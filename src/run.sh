@@ -1,2 +1,2 @@
 #!/bin/bash
-python pnp-test.py ./test_bnp_test/test_data/input.xml
+python bnp-test.py ./test_tradestatus/test_data/input.xml

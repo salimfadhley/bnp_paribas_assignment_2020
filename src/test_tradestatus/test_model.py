@@ -1,11 +1,12 @@
-import pandas as pd
-from bnp_test.main import (
+import numpy as np
+import pandas
+from test_tradestatus.test_data import get_test_data_stream
+from tradestatus.model import (
     calculate_summary_table,
     get_empty_main_table,
     get_populated_table,
     read_xml,
 )
-from test_bnp_test.test_data import get_test_data_stream
 
 
 def test_read_xml_0():
@@ -30,7 +31,16 @@ def test_get_dataframe_from_xml():
 def test_calculate_summary_table():
     table = get_populated_table(read_xml(get_test_data_stream("input.xml")))
     summary_table = calculate_summary_table(table)
+    assert len(summary_table) == 3
 
-    print("\n\n\n")
-    print(summary_table)
-    print("\n\n")
+
+def test_get_blank_table():
+    assert len(get_empty_main_table()) == 0
+
+
+def test_column_types():
+    df: pandas.DataFrame = get_empty_main_table()
+    column_types = dict(zip(df.columns, df.dtypes))
+    assert column_types["Limit"] == np.int64
+    assert column_types["NumberOfTrades"] == np.int64
+    assert column_types["Value"] == np.int64
