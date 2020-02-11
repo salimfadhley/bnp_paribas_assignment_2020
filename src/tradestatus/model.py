@@ -1,9 +1,13 @@
 import io
+import logging
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
-from typing import IO, Iterator, TextIO
+from typing import Iterator, TextIO
 
 import pandas
+
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
 
 
 def get_empty_main_table() -> pandas.DataFrame:
@@ -16,12 +20,14 @@ def get_empty_main_table() -> pandas.DataFrame:
     ]
 
     column_names, _ = zip(*cols)
-
+    # This is an odd-looking hack, but actually the quickest way to get an empty data-frame with
+    # correctly typed columns.
     return pandas.read_csv(io.StringIO(""), names=column_names, dtype=dict(cols))
 
 
 @dataclass
 class Trade:
+    # Represents a single loaded trade.
     CorrelationID: str
     NumberOfTrades: str
     Limit: str
@@ -39,16 +45,19 @@ class Trade:
 
     @classmethod
     def from_xml(cls, trade: ET.Element) -> "Trade":
-        return cls(Value=trade.text, **trade.attrib)
+        result = cls(Value=trade.text or "0", **trade.attrib)
+        return result
 
 
-def read_xml(stream: IO[str]) -> Iterator[Trade]:
+def read_xml(stream: TextIO) -> Iterator[Trade]:
     tree = ET.parse(stream)
     root = tree.getroot()
     trades = root.findall("./Trade")
 
     for trade in trades:
         yield Trade.from_xml(trade)
+
+    log.info(f"Loaded {len(trades)} trade records.")
 
 
 def get_populated_table(data: Iterator[Trade]) -> pandas.DataFrame:

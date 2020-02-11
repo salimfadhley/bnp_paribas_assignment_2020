@@ -21,7 +21,7 @@ def main(input_path: str, output_path: str, log_file: str):
     root_logger = logging.getLogger(__name__)
     root_logger.setLevel(logging.INFO)
 
-    fhf = logging.Formatter(fmt="'%(asctime)s - %(levelname)s - %(message)s'")
+    fhf = logging.Formatter(fmt="%(asctime)s - %(levelname)s - %(message)s")
 
     fh = logging.FileHandler(log_file)
     log.info(f"Writing logs to {log_file}")
