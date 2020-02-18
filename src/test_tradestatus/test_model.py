@@ -51,6 +51,6 @@ def test_column_types():
     """
     df: pandas.DataFrame = get_empty_main_table()
     column_types = dict(zip(df.columns, df.dtypes))
-    assert column_types["Limit"] == np.int64
-    assert column_types["NumberOfTrades"] == np.int64
-    assert column_types["Value"] == np.int64
+    assert column_types["Limit"] in [np.int64, np.dtype('int32')]
+    assert column_types["NumberOfTrades"] in [np.int64, np.dtype('int32')]
+    assert column_types["Value"] in [np.int64, np.dtype('int32')]
